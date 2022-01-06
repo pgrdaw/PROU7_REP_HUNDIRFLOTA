@@ -152,6 +152,9 @@ public class PGRPROU7EvaluableHundirFlota {
     public static char[] crearFlota(int nivel) {
         char[] flota;
         switch (nivel) {
+            case 0:     // nivel para pruebas
+                flota = new char[]{'P','P','P', 'Z', 'B', 'B', 'B', 'Z', 'B', 'B', 'B', 'L', 'L', 'L', 'L', 'L'};
+                break;
             case 1:     // nivel fácil
                 flota = new char[]{'P', 'Z', 'B', 'B', 'B', 'L', 'L', 'L', 'L', 'L'};
                 break;
@@ -186,6 +189,7 @@ public class PGRPROU7EvaluableHundirFlota {
         System.out.println("*  by Pablo Gimeno  *");
         System.out.println("*                   *");
         System.out.println("*********************");
+        pausa(500);
 
     }
 
@@ -203,7 +207,7 @@ public class PGRPROU7EvaluableHundirFlota {
     }
 
     /**
-     * pregunta al usuario el nivel de dificultad y define el escenario 
+     * pregunta al usuario el nivel de dificultad y define el escenario
      *
      * @return int[] {nivel, alto, ancho, intentos}
      */
@@ -218,10 +222,17 @@ public class PGRPROU7EvaluableHundirFlota {
         System.out.println("* 9 - personalizado *");
         System.out.println("*********************");
         System.out.println("");
+        pausa(500);
         System.out.print("Seleccionar nivel de dificultad: ");
         try {
             escenario[0] = entrada.nextInt();
             switch (escenario[0]) {
+                case 0:
+                    escenario[1] = 7;  // alto del tablero
+                    escenario[2] = 9;  // ancho del tablero
+                    escenario[3] = 10;  // número máximo de intentos
+                    break;
+                    
                 case 1:
                     escenario[1] = 10;  // alto del tablero
                     escenario[2] = 10;  // ancho del tablero
@@ -253,23 +264,76 @@ public class PGRPROU7EvaluableHundirFlota {
     }
 
     /**
+     * Pregunta el disparo y modifica el tableroVisible en función de lo que
+     * contenga el tableroOculto en esa casilla
+     *
+     * @param tableroOculto matriz con la posición de todos los barcos 
+     * @param tableroVisible matriz con la información conocida 
+     * @return tableroVisible actualizado una vez efectuado el disparo
+     */
+    public static char[][] disparo(char[][] tableroOculto, char[][] tableroVisible) {
+        int fil, col;
+        String disparo;
+        Scanner entrada = new Scanner(System.in);
+        // System.out.print("Disparo: ");
+        disparo = entrada.next();
+        fil = disparo.charAt(0) - 'A' + 1;
+        col = disparo.charAt(1) - '0' + 1;
+        pausa(500);
+        //System.out.println("fila: " + fil);
+        //System.out.println("columna " + col);
+        try {
+            switch (tableroOculto[fil][col]) {
+                case '-':
+                case 'A':
+                    System.out.println("");
+                    System.out.println("¡AGUA!");
+                    tableroVisible[fil][col] = 'A';
+                    pausa(500);
+                    break;
+                default:
+                    System.out.println("");
+                    System.out.println("¡TOCADO!");
+                    tableroVisible[fil][col] = 'X';
+                    pausa(500);
+                     
+            }
+        } catch (Exception e) {
+            System.out.println("");
+            System.out.println("Disparo fuera de los límites del tablero.");
+            System.out.println("Prueba algo como: "
+                    + (char) ('A' + (Math.random() * (tableroVisible.length - 1)))
+                    + (char) ('0' + (Math.random() * (tableroVisible[0].length - 1))));
+            pausa(1000);
+        }
+
+        return tableroVisible;
+
+    }
+
+    /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        int turno = 1;
-        
+        int municion = 0;
+
         entradilla();       // mostrar la entradilla 
-        pausa(500);
+
         int escenario[] = escenario();  // elegir escenario
         char[] flota = crearFlota(escenario[0]);   // crear la flota acorde al nivel
         char[][] tableroVisible = crearTablero(escenario[1], escenario[2]);    // crear tablero visible
         char[][] tableroOculto = crearTablero(escenario[1], escenario[2]);     // crear tablero oculto
         llenarTablero(tableroOculto, flota);          // llenar tablero oculto con flota
+        municion = escenario[3];
 
-        mostrarTablero(tableroVisible);
+        while (municion > 0) {
+            mostrarTablero(tableroVisible);
+            System.out.println("");
+            System.out.print("Disparo " + municion + " / " + escenario[3] + ": ");
+            disparo(tableroOculto, tableroVisible);
+            municion--;
+        }
         mostrarTablero(tableroOculto);
-        System.out.println("Disparos disponibles: " + turno + " / " + escenario[3]);
-        // disparos(nivel[0], turno);
 
     }
 

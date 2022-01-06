@@ -4,6 +4,8 @@
  */
 package pgrprou7evaluablehundirflota;
 
+import java.util.Scanner;
+
 /**
  * Versión simplificada del popular juego hundir la flota. En este caso el
  * jugador dispara a una flota distribuida aleatoriamente por un tablero oculto
@@ -131,6 +133,7 @@ public class PGRPROU7EvaluableHundirFlota {
      * @param tablero matriz de chars
      */
     public static void mostrarTablero(char[][] tablero) {
+        System.out.println("");
         for (int fil = 0; fil < tablero.length; fil++) {
             for (int col = 0; col < tablero[fil].length; col++) {
                 System.out.printf("%2c", tablero[fil][col]);
@@ -149,37 +152,48 @@ public class PGRPROU7EvaluableHundirFlota {
     public static char[] crearFlota(int nivel) {
         char[] flota;
         switch (nivel) {
-            case 0: // nivel para pruebas
-                flota = new char[]{'P', 'P', 'Z', 'Z', 'B', 'B', 'L', 'L'};
-                break;
-            case 1:
+            case 1:     // nivel fácil
                 flota = new char[]{'P', 'Z', 'B', 'B', 'B', 'L', 'L', 'L', 'L', 'L'};
                 break;
-            case 2:
+            case 2:     // nivel medio
                 flota = new char[]{'P', 'Z', 'B', 'L', 'L'};
                 break;
-            case 3:
+            case 3:     // nivel difícil
                 flota = new char[]{'B', 'L'};
                 break;
-            default:
+
+            /*Aquí habrá que implementar el código para personalizar 
+                la flota al elegir el nivel 9 - personalizado
+             
+            case 9:     // nivel personalizado   
+                flota = new char[]{'P', 'P', 'Z', 'Z', 'B', 'B', 'L', 'L'};
+                break;
+             */
+            default:    // nivel default
                 flota = new char[]{'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L'};
         }
         return flota;
     }
 
+    /**
+     * Muestra en pantalla la entradilla
+     */
     public static void entradilla() {
         System.out.println("");
-        System.out.println(" *********************");
-        System.out.println(" *                   *");
-        System.out.println(" *  HUNDIR LA FLOTA  *");
-        System.out.println(" *  by Pablo Gimeno  *");        
-        System.out.println(" *                   *");
-        System.out.println(" *********************");
-        System.out.println("");
-        pausa(1000);
+        System.out.println("*********************");
+        System.out.println("*                   *");
+        System.out.println("*  HUNDIR LA FLOTA  *");
+        System.out.println("*  by Pablo Gimeno  *");
+        System.out.println("*                   *");
+        System.out.println("*********************");
 
     }
 
+    /**
+     * pausa el programa durante ms milisegundos
+     *
+     * @param ms milisegundos de pausa
+     */
     public static void pausa(int ms) {
         try {
             Thread.sleep(ms);
@@ -189,16 +203,74 @@ public class PGRPROU7EvaluableHundirFlota {
     }
 
     /**
+     * pregunta al usuario el nivel de dificultad y define el escenario 
+     *
+     * @return int[] {nivel, alto, ancho, intentos}
+     */
+    public static int[] escenario() {
+        int escenario[] = new int[4];
+        Scanner entrada = new Scanner(System.in);
+        System.out.println("");
+        System.out.println("****** NIVELES ******");
+        System.out.println("* 1 - fácil         *");
+        System.out.println("* 2 - medio         *");
+        System.out.println("* 3 - difícil       *");
+        System.out.println("* 9 - personalizado *");
+        System.out.println("*********************");
+        System.out.println("");
+        System.out.print("Seleccionar nivel de dificultad: ");
+        try {
+            escenario[0] = entrada.nextInt();
+            switch (escenario[0]) {
+                case 1:
+                    escenario[1] = 10;  // alto del tablero
+                    escenario[2] = 10;  // ancho del tablero
+                    escenario[3] = 50;  // número máximo de intentos
+                    break;
+                case 2:
+                    escenario[1] = 10;
+                    escenario[2] = 10;
+                    escenario[3] = 30;
+                    break;
+                case 3:
+                    escenario[1] = 10;
+                    escenario[2] = 10;
+                    escenario[3] = 10;
+                    break;
+                default:
+                    escenario[1] = 10;
+                    escenario[2] = 10;
+                    escenario[3] = 50;
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("");
+            System.out.println("¡¡ Nivel no válido. Seleccionado el nivel por defecto !!");
+            escenario = new int[]{0, 10, 10, 50};
+        }
+        return escenario;
+    }
+
+    /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        int alto = 10, ancho = 10, nivel = 1;
-        entradilla();
+        int turno = 1;
+        
+        entradilla();       // mostrar la entradilla 
+        pausa(500);
+        int escenario[] = escenario();  // elegir escenario
+        char[] flota = crearFlota(escenario[0]);   // crear la flota acorde al nivel
+        char[][] tableroVisible = crearTablero(escenario[1], escenario[2]);    // crear tablero visible
+        char[][] tableroOculto = crearTablero(escenario[1], escenario[2]);     // crear tablero oculto
+        llenarTablero(tableroOculto, flota);          // llenar tablero oculto con flota
 
-        char[] flota = crearFlota(nivel);
-        char[][] tablero = crearTablero(alto, ancho);
-        llenarTablero(tablero, flota);
-        mostrarTablero(tablero);
+        mostrarTablero(tableroVisible);
+        mostrarTablero(tableroOculto);
+        System.out.println("Disparos disponibles: " + turno + " / " + escenario[3]);
+        // disparos(nivel[0], turno);
+
     }
 
 }

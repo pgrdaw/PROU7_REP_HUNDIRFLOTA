@@ -151,9 +151,10 @@ public class PGRPROU7EvaluableHundirFlota {
      */
     public static char[] crearFlota(int nivel) {
         char[] flota;
+        Scanner entrada = new Scanner(System.in);
         switch (nivel) {
             case 0:     // nivel para pruebas
-                flota = new char[]{'P','P','P', 'Z', 'B', 'B', 'B', 'Z', 'B', 'B', 'B', 'L', 'L', 'L', 'L', 'L'};
+                flota = new char[]{'L', 'L', 'L', 'L', 'L'};
                 break;
             case 1:     // nivel fácil
                 flota = new char[]{'P', 'Z', 'B', 'B', 'B', 'L', 'L', 'L', 'L', 'L'};
@@ -164,14 +165,29 @@ public class PGRPROU7EvaluableHundirFlota {
             case 3:     // nivel difícil
                 flota = new char[]{'B', 'L'};
                 break;
-
-            /*Aquí habrá que implementar el código para personalizar 
-                la flota al elegir el nivel 9 - personalizado
-             
             case 9:     // nivel personalizado   
-                flota = new char[]{'P', 'P', 'Z', 'Z', 'B', 'B', 'L', 'L'};
+                System.out.print("Introduce número de portaaviones: ");
+                int P = entrada.nextInt();
+                System.out.print("Introduce número de acorazados: ");
+                int Z = entrada.nextInt();
+                System.out.print("Introduce número de fragatas: ");
+                int B = entrada.nextInt();
+                System.out.print("Introduce número de lanchas: ");
+                int L = entrada.nextInt();
+                flota = new char[P + Z + B + L];
+                for (int i = 0; i < P; i++) {
+                    flota[i] = 'P';
+                }
+                for (int i = P; i < P + Z; i++) {
+                    flota[i] = 'Z';
+                }
+                for (int i = P + Z; i < P + Z + B; i++) {
+                    flota[i] = 'B';
+                }
+                for (int i = P + Z + B; i < P + Z + B + L; i++) {
+                    flota[i] = 'L';
+                }
                 break;
-             */
             default:    // nivel default
                 flota = new char[]{'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L', 'L'};
         }
@@ -228,15 +244,15 @@ public class PGRPROU7EvaluableHundirFlota {
             escenario[0] = entrada.nextInt();
             switch (escenario[0]) {
                 case 0:
-                    escenario[1] = 7;  // alto del tablero
-                    escenario[2] = 9;  // ancho del tablero
-                    escenario[3] = 10;  // número máximo de intentos
+                    escenario[1] = 5;  // alto del tablero
+                    escenario[2] = 5;  // ancho del tablero
+                    escenario[3] = 10;  // munición
                     break;
-                    
+
                 case 1:
                     escenario[1] = 10;  // alto del tablero
                     escenario[2] = 10;  // ancho del tablero
-                    escenario[3] = 50;  // número máximo de intentos
+                    escenario[3] = 50;  // munición
                     break;
                 case 2:
                     escenario[1] = 10;
@@ -248,13 +264,19 @@ public class PGRPROU7EvaluableHundirFlota {
                     escenario[2] = 10;
                     escenario[3] = 10;
                     break;
+                case 9:
+                    System.out.print("Introduce alto del tablero: ");
+                    escenario[1] = entrada.nextInt();
+                    System.out.print("Introduce ancho del tablero: ");
+                    escenario[2] = entrada.nextInt();
+                    System.out.print("Introduce cantidad de munición: ");
+                    escenario[3] = entrada.nextInt();
+                    break;
                 default:
                     escenario[1] = 10;
                     escenario[2] = 10;
                     escenario[3] = 50;
-
             }
-
         } catch (Exception e) {
             System.out.println("");
             System.out.println("¡¡ Nivel no válido. Seleccionado el nivel por defecto !!");
@@ -267,8 +289,8 @@ public class PGRPROU7EvaluableHundirFlota {
      * Pregunta el disparo y modifica el tableroVisible en función de lo que
      * contenga el tableroOculto en esa casilla
      *
-     * @param tableroOculto matriz con la posición de todos los barcos 
-     * @param tableroVisible matriz con la información conocida 
+     * @param tableroOculto matriz con la posición de todos los barcos
+     * @param tableroVisible matriz con la información conocida
      * @return tableroVisible actualizado una vez efectuado el disparo
      */
     public static char[][] disparo(char[][] tableroOculto, char[][] tableroVisible) {
@@ -287,16 +309,20 @@ public class PGRPROU7EvaluableHundirFlota {
                 case '-':
                 case 'A':
                     System.out.println("");
-                    System.out.println("¡AGUA!");
+                    System.out.println("      ************");
+                    System.out.println("      *   AGUA   *");
+                    System.out.println("      ************");
                     tableroVisible[fil][col] = 'A';
                     pausa(500);
                     break;
                 default:
                     System.out.println("");
-                    System.out.println("¡TOCADO!");
+                    System.out.println("      ************");
+                    System.out.println("      *  TOCADO  *");
+                    System.out.println("      ************");
                     tableroVisible[fil][col] = 'X';
                     pausa(500);
-                     
+
             }
         } catch (Exception e) {
             System.out.println("");
@@ -315,26 +341,64 @@ public class PGRPROU7EvaluableHundirFlota {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        int municion = 0;
+        // declaración de variables
+        int municion = 0, objetivos = 0, tocados = 0;
 
-        entradilla();       // mostrar la entradilla 
-
+        // comienzo del programa
+        entradilla();       // mostrar la entradilla
         int escenario[] = escenario();  // elegir escenario
         char[] flota = crearFlota(escenario[0]);   // crear la flota acorde al nivel
         char[][] tableroVisible = crearTablero(escenario[1], escenario[2]);    // crear tablero visible
         char[][] tableroOculto = crearTablero(escenario[1], escenario[2]);     // crear tablero oculto
         llenarTablero(tableroOculto, flota);          // llenar tablero oculto con flota
+        // contar cuantas posiciones están ocupadas por barcos
+        for (int fil = 1; fil < tableroOculto.length; fil++) {
+            for (int col = 1; col < tableroOculto[0].length; col++) {
+                if (tableroOculto[fil][col] != '-') {
+                    objetivos++;
+                }
+            }
+        }
         municion = escenario[3];
-
-        while (municion > 0) {
+        // mostrat tablero, tocados y munición y preguntar disparo mientras haya posibilidades de ganar
+        while ((municion >= objetivos - tocados) && (objetivos > tocados)) {
             mostrarTablero(tableroVisible);
             System.out.println("");
-            System.out.print("Disparo " + municion + " / " + escenario[3] + ": ");
-            disparo(tableroOculto, tableroVisible);
+            System.out.println("Tocados  " + tocados + " / " + objetivos);
+            System.out.println("Municion " + municion + " / " + escenario[3]);
+            System.out.print("Disparo: ");
+            tableroVisible = disparo(tableroOculto, tableroVisible);
             municion--;
+            tocados = 0;
+            //recuento de tocados
+            for (int fil = 0; fil < tableroVisible.length; fil++) {
+                for (int col = 0; col < tableroVisible[0].length; col++) {
+                    if (tableroVisible[fil][col] == 'X') {
+                        tocados++;
+                    }
+                }
+            }
+        }
+        if (municion < objetivos - tocados) {
+            System.out.println("");
+            System.out.println("*************** GAME OVER ****************");
+            System.out.println("*                                        *");
+            System.out.println("*     No tienes suficiente munición      *");
+            System.out.println("*     para hundir la flota restante      *");
+            System.out.println("*                                        *");
+            System.out.println("******************************************");
+            pausa(1000);
+        } else {
+            System.out.println("");
+            System.out.println("********* YOU WIN *********");
+            System.out.println("*                         *");
+            System.out.println("*       Enhorabuena       *");
+            System.out.println("*       Has ganado!       *");
+            System.out.println("*                         *");
+            System.out.println("***************************");
+            pausa(1000);
         }
         mostrarTablero(tableroOculto);
-
+        System.out.println("");
     }
-
 }
